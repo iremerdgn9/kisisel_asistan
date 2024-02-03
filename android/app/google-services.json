@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "959087843995",
+    "project_id": "kisisel-asistan-login",
+    "storage_bucket": "kisisel-asistan-login.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:959087843995:android:211db8eefb37184a22443e",
+        "android_client_info": {
+          "package_name": "com.example.kisisel_asistan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5o8T9tzN_epew6XVZCZKJhUp2lNp0M8A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
