@@ -7,6 +7,7 @@ import '/dashboard.dart';
 import 'auth/logIn.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

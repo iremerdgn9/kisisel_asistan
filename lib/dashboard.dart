@@ -107,7 +107,7 @@ class _DashboardState extends State<Dashboard> {
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        toolbarHeight: 70, // İstediğiniz yüksekliği ayarlayın
+        toolbarHeight: 100, // İstediğiniz yüksekliği ayarlayın
         backgroundColor: Color(0xFFFFEDEA),
         leading: Builder(
           builder: (context) {
@@ -126,9 +126,9 @@ class _DashboardState extends State<Dashboard> {
                 Text(" My",
                   style: TextStyle(fontWeight: FontWeight.bold,fontSize: 30,color:Color(0xFFCEA0AA) ),),
                 Text("Personal",
-                  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25,color:Color(0xFF9DB0CE) ),),
+                  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 30,color:Color(0xFF9DB0CE) ),),
                 Text("Assistant",
-                  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25,color:Color(
+                  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 30,color:Color(
                       0xFF364765) ),),
               ],
             ),

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,6 +28,10 @@ class _LogInState extends State<LogIn> {
     try{
       UserCredential userCredential = await auth.signInWithEmailAndPassword(email: email, password: password);
       user = userCredential.user;
+      //await FirebaseFirestore.instance.collection('users').doc('userId').set({
+        //'adSoyad': adSoyad,
+        //'email': email,
+      //});
     }on FirebaseAuthException catch(e){
       if(e.code == "user-not-found"){
         print("No User Found for that email");
@@ -35,10 +40,12 @@ class _LogInState extends State<LogIn> {
     return user;
   }
 
+  bool _isPasswordVisible = false;
+
   @override
   Widget build(BuildContext context) {
-    TextEditingController _emailController = TextEditingController();
-    TextEditingController _passwordController = TextEditingController();
+   TextEditingController _emailController = TextEditingController();
+   TextEditingController _passwordController = TextEditingController();
 
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -108,14 +115,25 @@ class _LogInState extends State<LogIn> {
                                   color: Color(0xFFb5b5b5),
                                 )),
                               ),
-                              child: TextField(
+                              child: TextFormField(
                                 controller: _passwordController,
-                                decoration: const InputDecoration(
+                                obscureText: !_isPasswordVisible,
+                                decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: "Password",
                                   hintStyle: TextStyle(color: Color(0xFFc9c7c7)),
+                                  suffixIcon: IconButton(
+                                    onPressed: (){
+                                      setState(() {
+                                        _isPasswordVisible = !_isPasswordVisible;
+                                      });
+                                    },
+                                    icon: Icon(
+                                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                                    ),
+                                  ),
                                 ),
-                              )
+                              ),
                           ),
                           const SizedBox(height: 10,),
                           Row(
