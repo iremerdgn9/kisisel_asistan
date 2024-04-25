@@ -69,7 +69,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         const SizedBox(height: 10,),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Text('${weather.tarih}\n ${weather.gun} ${weather.durum.toUpperCase()}  ${weather.derece}°',
+                          child: Text('${weather.tarih}  ${weather.gun}\n  ${weather.durum.toUpperCase()}   ${weather.derece}°',
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 20,color: Colors.black),
                           ),
