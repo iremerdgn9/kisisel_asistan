@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kisisel_asistan/dashboard.dart';
 import 'package:kisisel_asistan/models/news_model.dart';
 import 'package:kisisel_asistan/services/news_service.dart';
 import 'package:kisisel_asistan/models//source_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({Key? key});
@@ -67,63 +69,56 @@ class _NewsScreenState extends State<NewsScreen> {
                     itemCount: articles?.length,
                     itemBuilder: (context, index) {
                       final NewsModel article = articles![index];
-
-                      return Card(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                if (article.urlToImage != null) {
+                  return Card(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Image.network(
+                          articles[index].urlToImage.toString(),
+                        ),
+                        const SizedBox(height: 10,),
+                        ListTile(
+                          leading: Icon(Icons.favorite_border),
+                          minLeadingWidth: 3,
+                          title: Text(articles[index].title.toString(),
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),),
+                          subtitle: Text(articles[index].author.toString()),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(1.0),
+                          child: Text(
+                            articles[index].description.toString(),
+                            style: TextStyle(fontSize: 15),),
+                        ),
+                        ButtonBar(
+                          alignment: MainAxisAlignment.start,
                           children: <Widget>[
-                            FavoriteButton(
-                              isFavorite: false, valueChanged: (_isFavorite) {  },
-
-                            ),
-                                    Image.network(articles[index].urlToImage.toString()),
-                            
-                            const SizedBox(height: 10,),
-                            ListTile(
-                              leading: Icon(Icons.arrow_circle_down),
-                              minLeadingWidth: 3,
-                              title: Text(articles[index].title.toString(),
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),),
-                              subtitle: Text(articles[index].author.toString()),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
+                            TextButton(
+                              onPressed: () async {
+                                String? url = articles[index].url?.toString();
+                                print(
+                                    'URL: $url'); // URL'nin doğru olduğunu kontrol etmek için
+                                if (url != null && url.isNotEmpty) {
+                                  print('URL açılıyor...');
+                                  await launch(url);
+                                }
+                              },
                               child: Text(
-                                articles[index].description.toString(),
-                                style: TextStyle(fontSize: 15),),
-                            ),
-                            ButtonBar(
-                              alignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                FlatButton(
-                                  color: Colors.white30,
-                                  textColor: Colors.deepPurple,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5)),
-                                  onPressed: () async {
-                                    await (articles[index].url.toString());
-                                  },
-                                  child: Text(
-                                    'Habere Git',
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                ),
-                                StarButton(
-                                  isStarred: true,
-                                  iconSize: 50,
-                                  iconColor: Colors.yellowAccent,
-                                  iconDisabledColor: Colors.deepOrangeAccent,
-                                  valueChanged: (_isStarred) {
-                                    print('Is Starred : $_isStarred');
-                                  },
-                                ),
-                              ],
+                                'Habere Git',
+                                style: TextStyle(fontSize: 18),
+                              ),
                             ),
                           ],
                         ),
-                      );
+                      ],
+                    ),
+                  );
+                }else{
+                  return SizedBox();
+                }
                     }),
               );
             } else {
@@ -133,11 +128,5 @@ class _NewsScreenState extends State<NewsScreen> {
     ),
     );
     }
-
-  FavoriteButton({required bool isFavorite, required Null Function(dynamic _isFavorite) valueChanged}) {}
-
-  FlatButton({required Color color, required MaterialColor textColor, required RoundedRectangleBorder shape, required Future<Null> Function() onPressed, required Text child}) {}
-
-  StarButton({required bool isStarred, required int iconSize, required MaterialAccentColor iconColor, required MaterialAccentColor iconDisabledColor, required Null Function(dynamic _isStarred) valueChanged}) {}
-
   }
+
