@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:kisisel_asistan/auth/googleSignIn.dart';
 import 'package:kisisel_asistan/auth/signUp.dart';
 import 'package:kisisel_asistan/dashboard.dart';
+import 'package:sign_in_button/sign_in_button.dart';
 
 
 class LogIn extends StatefulWidget {
@@ -29,8 +31,8 @@ class _LogInState extends State<LogIn> {
       UserCredential userCredential = await auth.signInWithEmailAndPassword(email: email, password: password);
       user = userCredential.user;
       //await FirebaseFirestore.instance.collection('users').doc('userId').set({
-        //'adSoyad': adSoyad,
-        //'email': email,
+      //'adSoyad': adSoyad,
+      //'email': email,
       //});
     }on FirebaseAuthException catch(e){
       if(e.code == "user-not-found"){
@@ -41,16 +43,14 @@ class _LogInState extends State<LogIn> {
   }
 
   bool _isPasswordVisible = false;
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-   TextEditingController _emailController = TextEditingController();
-   TextEditingController _passwordController = TextEditingController();
-
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-
       body: SingleChildScrollView(
         child: Container(
           width: double.infinity,
@@ -109,31 +109,32 @@ class _LogInState extends State<LogIn> {
                               )
                           ),
                           Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: const BoxDecoration(
-                                border: Border(bottom: BorderSide(
-                                  color: Color(0xFFb5b5b5),
-                                )),
-                              ),
-                              child: TextFormField(
-                                controller: _passwordController,
-                                obscureText: !_isPasswordVisible,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "Password",
-                                  hintStyle: TextStyle(color: Color(0xFFc9c7c7)),
-                                  suffixIcon: IconButton(
-                                    onPressed: (){
-                                      setState(() {
-                                        _isPasswordVisible = !_isPasswordVisible;
-                                      });
-                                    },
-                                    icon: Icon(
-                                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                                    ),
+                            padding: const EdgeInsets.all(10),
+                            decoration: const BoxDecoration(
+                              border: Border(bottom: BorderSide(
+                                color: Color(0xFFb5b5b5),
+                              )),
+                            ),
+                            child: TextFormField(
+                              controller: _passwordController,
+                              keyboardType: TextInputType.emailAddress,
+                              obscureText: !_isPasswordVisible,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Password",
+                                hintStyle: TextStyle(color: Color(0xFFc9c7c7)),
+                                suffixIcon: IconButton(
+                                  onPressed: (){
+                                    setState(() {
+                                      _isPasswordVisible = !_isPasswordVisible;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                                   ),
                                 ),
                               ),
+                            ),
                           ),
                           const SizedBox(height: 10,),
                           Row(
@@ -183,12 +184,24 @@ class _LogInState extends State<LogIn> {
                               TextButton(
                                 onPressed: () async {
 
-                                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> const SignUp(),));
+                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> const SignUp(),));
 
                                 },
                                 child: const Text("Create Account", style:TextStyle(color: Color(
                                     0xFFB68277),),
                                 ),),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SignInButton(
+                                Buttons.google,
+                                text:"Sign In With Google" ,
+                                onPressed: () async {
+                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> const GoogleSignIn()));
+                                  },
+                                ),
                             ],
                           ),
                         ],
