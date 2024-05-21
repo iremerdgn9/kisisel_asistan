@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:kisisel_asistan/dashboard.dart';
 import 'package:kisisel_asistan/screens/add_note.dart';
 import 'package:kisisel_asistan/screens/detail_notes.dart';
@@ -77,14 +79,18 @@ class _NoteScreenState extends State<NoteScreen> {
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                              children:<Widget> [
                                 Row(
-                                  children: [
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children:<Widget> [
                                     Icon(Icons.done_all),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      doc["note_title"],
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    SizedBox(height: 8),
+                                    Expanded(
+                                      child: Text(doc["note_title"],
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -92,8 +98,12 @@ class _NoteScreenState extends State<NoteScreen> {
                                 Text(doc["creation_date"],),
                                 SizedBox(height: 10,),
 
-                                Text(doc["note_content"],
-                                overflow: TextOverflow.ellipsis,),
+                                Expanded(
+                                  child: Text(doc["note_content"],
+                                  overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(fontSize: 17),
+                                  ),
+                                ),
                                 SizedBox(height: 10,),
                               ],
                             ),
@@ -103,7 +113,7 @@ class _NoteScreenState extends State<NoteScreen> {
                     );
                   }
                   if(snapshot.data!.docs.isEmpty) {
-                    return Center(child: Text('Veri bulunamadı.'));
+                    return const Center(child: Text('Veri bulunamadı.'));
                   }
                   return Container();
                 },
@@ -119,9 +129,9 @@ class _NoteScreenState extends State<NoteScreen> {
             MaterialPageRoute(builder: (context) => const AddNote(),),
           );
         },
-        backgroundColor: Color(0xFF9DB0CE),
-        label: Text("Add Note"),
-        icon: Icon(Icons.add_card),
+        backgroundColor: const Color(0xFF9DB0CE),
+        label: const Text("Add Note"),
+        icon: const Icon(Icons.add_card),
 
       ),
     );

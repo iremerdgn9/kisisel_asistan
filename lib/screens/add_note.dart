@@ -32,31 +32,33 @@ String date= DateTime.now().toString();
         ),
         body: Padding(
         padding: EdgeInsets.all(18.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Note Title',
-                hintStyle: TextStyle(color: Color(0xFFc9c7c7)),
-
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Note Title',
+                  hintStyle: TextStyle(color: Color(0xFFc9c7c7)),
+          
+                ),
               ),
-            ),
-            SizedBox(height: 25.0,),
-            TextField(
-              controller: _mainController,
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Note Content',
-                hintStyle: TextStyle(color: Color(0xFFc9c7c7)),
+              SizedBox(height: 25.0,),
+              TextField(
+                controller: _mainController,
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Note Content',
+                  hintStyle: TextStyle(color: Color(0xFFc9c7c7)),
+                ),
               ),
-            ),
-            SizedBox(height: 25.0,),
-            Text(date,),
-          ],
+              SizedBox(height: 25.0,),
+              Text(date,),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -67,14 +69,14 @@ String date= DateTime.now().toString();
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("Uyarı"),
-              content: Text("Başlık ve içerik boş bırakılamaz."),
+              title: const Text("Uyarı"),
+              content: const Text("Başlık ve içerik boş bırakılamaz."),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text("Tamam"),
+                  child: const Text("Tamam"),
                 ),
               ],
             );
