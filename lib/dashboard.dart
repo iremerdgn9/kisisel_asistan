@@ -221,7 +221,7 @@ class _DashboardState extends State<Dashboard> {
                     SizedBox(height: 5), // İstenilen boşluk
                   ],
                 ),
-                currentAccountPicture: Column(
+                currentAccountPicture: const Column(
                   children: [
                     CircleAvatar(
                       backgroundImage: AssetImage("assets/images/personal-assistant.png"),
@@ -270,7 +270,7 @@ class _DashboardState extends State<Dashboard> {
                           style: TextStyle(fontSize: 18),),
                         leading: Icon(Icons.calendar_month),
                         onTap: () {
-                          Navigator.pushNamed(context, '/HavaDurumu');
+                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> CalendarScreen(),));
                         },
                       ),
                       Divider(
@@ -281,7 +281,7 @@ class _DashboardState extends State<Dashboard> {
                           style: TextStyle(fontSize: 18),),
                         leading: Icon(Icons.wb_sunny),
                         onTap: () {
-                          Navigator.pushNamed(context, '/HavaDurumu');
+                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> WeatherScreen(),));
                         },
                       ),
                       Divider(
@@ -292,18 +292,18 @@ class _DashboardState extends State<Dashboard> {
                             style: TextStyle(fontSize: 18),),
                           leading: new Icon(Icons.newspaper),
                           onTap: () {
-                            Navigator.pushNamed(context, '/Finans');
+                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> NewsScreen(),));
                           }
                       ),
                     ],
                   ),
                   ListTile(
-                      title: new Text("En Yeniler",
+                      title: new Text("Favorilerim",
                         style: TextStyle(fontSize: 18),),
                       leading: new Icon(Icons.newspaper),
                       trailing: Icon(Icons.arrow_right),
                       onTap: () {
-                        Navigator.pushNamed(context, '/EnYeniler');
+                        Navigator.pushNamed(context, '/Favoriler');
                       }
                   ),
                   ListTile(
@@ -312,8 +312,8 @@ class _DashboardState extends State<Dashboard> {
                       leading: new Icon(Icons.person),
                       trailing: Icon(Icons.arrow_right),
                       onTap: () {
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> ProfileScreen(adSoyad: ''),));
-                      }
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> const ProfileScreen(adSoyad: ''),));
+                    }
                   ),
           
                 ],

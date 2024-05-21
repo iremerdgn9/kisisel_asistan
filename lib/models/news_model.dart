@@ -8,8 +8,9 @@ class NewsModel {
   final String? urlToImage;
   final String? publishedAt;
   final String? content;
+  final String? category;
 
-  NewsModel(this.source,this.author,this.title,this.description,this.url,this.urlToImage,this.publishedAt,this.content);
+  NewsModel(this.category,this.source,this.author,this.title,this.description,this.url,this.urlToImage,this.publishedAt,this.content);
 
    NewsModel.fromJson(Map<String,dynamic> json)
      :
@@ -20,6 +21,7 @@ class NewsModel {
      url = json['url'],
      urlToImage = json['urlToImage'],
      publishedAt = json['publishedAt'],
+     category = json['category'],
      content = json['content'];
    }
 
@@ -35,23 +37,10 @@ Map<String, dynamic> toJson() {
   data['urlToImage'];
   data['publishedAt'] ;
   data['content'];
+  data['category'];
   return data;
 }
 
-
-      //source: Source.fromJson(json['source']),
-      //author: json['author'] as String,
-      //title: json['title'] as String,
-      //description: json['description'] as String,
-      //url: json['url'] as String,
-      //urlToImage: json['urlToImage'] as String,
-      //publishedAt: json['publishedAt'] as String,
-      //content: json['content'] as String,
-
-
-    //);
-  //}
-//}
 
 
 

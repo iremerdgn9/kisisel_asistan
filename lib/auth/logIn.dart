@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:sign_in_button/sign_in_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kisisel_asistan/auth/googleSignIn.dart';
 import 'package:kisisel_asistan/auth/signUp.dart';
 import 'package:kisisel_asistan/dashboard.dart';
@@ -9,23 +12,18 @@ import 'package:sign_in_button/sign_in_button.dart';
 
 
 class LogIn extends StatefulWidget {
-  const LogIn({Key? key}): super(key: key);
+  final String? adSoyad;
+  final String? email;
+  const LogIn({Key? key, this.adSoyad, this.email}): super(key: key);
   @override
   State<LogIn> createState() => _LogInState();
 }
 
 class _LogInState extends State<LogIn> {
-
+  final _auth = AuthService();
   static Future<User?> loginUsingEmailPassword({required String email, required String password, required BuildContext context}) async {
-    await Firebase.initializeApp(options: const FirebaseOptions(
-      apiKey:
-      "AIzaSyC5o8T9tzN_epew6XVZCZKJhUp2lNp0M8A",
-      appId:
-      "1:959087843995:android:211db8eefb37184a22443e",
-      messagingSenderId: "959087843995",
-      projectId: "kisisel-asistan-login",
-    ),);
-    FirebaseAuth auth = FirebaseAuth.instance;
+    await Firebase.initializeApp();
+    final FirebaseAuth auth = FirebaseAuth.instance;
     User? user;
     try{
       UserCredential userCredential = await auth.signInWithEmailAndPassword(email: email, password: password);
@@ -42,15 +40,76 @@ class _LogInState extends State<LogIn> {
     return user;
   }
 
+
   bool _isPasswordVisible = false;
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
+
+  late String adSoyad;
+  late String email;
+
+  @override
+  void initState() {
+    super.initState();
+    adSoyad = widget.adSoyad ?? 'Misafir Kullanıcı';
+    email = widget.email ?? 'email';
+    _loadUserData(); // Firestore verilerini yükle
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Firestore'dan verileri çek
+        DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        // Firestore'dan alınan verileri kullanarak adSoyad ve email'i güncelle
+        setState(() {
+          adSoyad = snapshot['adSoyad'] ?? 'Misafir Kullanıcı';
+          email = snapshot['email'] ?? 'email';
+        });
+      }
+    } catch (e) {
+      print('Firestore veri çekme hatası: $e');
+    }
+  }
+
+
+ /* void _handleGoogleIn(BuildContext context) async {
+    try {
+      final userCredential = await AuthService().signInWithGoogle();
+      if (userCredential != null) {
+        final user = userCredential.user!;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => Dashboard(
+              adSoyad: user.displayName ?? '',
+              email: user.email ?? '',
+            ),
+          ),
+        );
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Google sign-in failed: $error');
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Google sign-in failed: ${error.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+*/
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
+
       body: SingleChildScrollView(
         child: Container(
           width: double.infinity,
@@ -66,19 +125,17 @@ class _LogInState extends State<LogIn> {
             ),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children:<Widget>[
-              const SizedBox(height: 120,),
+              SizedBox(height: 50,),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-
+                padding: EdgeInsets.symmetric(horizontal: 40),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children:<Widget> [
                     const Text(" Log-in", style: TextStyle(color: Color(0xFF535878), fontSize: 25,),),
                     const SizedBox(height: 40,),
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: EdgeInsets.all(10),
                       decoration: const BoxDecoration(
                         color: Colors.white,
                         boxShadow:[
@@ -93,7 +150,7 @@ class _LogInState extends State<LogIn> {
                       child: Column(
                         children:<Widget> [
                           Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: EdgeInsets.all(10),
                               decoration: const BoxDecoration(
                                 border: Border(bottom: BorderSide(
                                   color: Color(0xFFb5b5b5),
@@ -162,7 +219,7 @@ class _LogInState extends State<LogIn> {
                               children: [
                                 TextButton(
                                   onPressed: () async {
-                                    User? user = await loginUsingEmailPassword(email: _emailController.text, password: _passwordController.text, context: context);
+                                    User? user = await loginUsingEmailPassword(email: _emailController.text, password: _passwordController.text, context: context,);
                                     print(user);
                                     if(user != null){
                                       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> const Dashboard(adSoyad: '', email: '',),));
@@ -183,9 +240,7 @@ class _LogInState extends State<LogIn> {
                             children: [
                               TextButton(
                                 onPressed: () async {
-
                                   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> const SignUp(),));
-
                                 },
                                 child: const Text("Create Account", style:TextStyle(color: Color(
                                     0xFFB68277),),
@@ -193,17 +248,37 @@ class _LogInState extends State<LogIn> {
                             ],
                           ),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SignInButton(
-                                Buttons.google,
-                                text:"Sign In With Google" ,
-                                onPressed: () async {
-                                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> const GoogleSignIn()));
-                                  },
-                                ),
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children:<Widget> [
+
+                              Column(
+                                children: [
+                                  SignInButton(
+                                    Buttons.google,
+                                    text: 'Sign Up With Google',
+                                    onPressed: () async {
+                                      UserCredential? userCredential = await _auth.loginWithGoogle();
+                                      if (userCredential != null) {
+                                        User? user = userCredential.user;
+                                        if (user != null) {
+                                          Navigator.of(context).pushReplacement(
+                                            MaterialPageRoute(
+                                              builder: (context) => Dashboard(
+                                                adSoyad: user.displayName ?? 'Misafir Kullanıcı',
+                                                email: user.email ?? 'email',
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
+
+
                         ],
                       ),
                     ),
@@ -212,7 +287,7 @@ class _LogInState extends State<LogIn> {
               ),
 
 
-              Container(
+              SizedBox(
                 height: 350,
                 width: width,
                 child: Stack(
@@ -239,5 +314,34 @@ class _LogInState extends State<LogIn> {
         ),
       ),
     );
+
   }
+
 }
+
+
+
+/*class AuthService {
+  signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+
+        final credential = GoogleAuthProvider.credential(
+          idToken: googleSignInAuthentication.idToken,
+          accessToken: googleSignInAuthentication.accessToken,
+        );
+
+        return await FirebaseAuth.instance.signInWithCredential(credential);
+      }
+    } catch (error) {
+      print(error);
+      return null;
+    }
+    return null;
+  }
+
+}
+ */

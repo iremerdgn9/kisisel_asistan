@@ -4,7 +4,7 @@ import 'package:kisisel_asistan/models/news_model.dart';
 
 class NewsApiService {
   static const String _apiKey = "eb9dee953a784f848a327036dee9153d";
-  final endPointUrl  = Uri.parse("https://newsapi.org/v2/top-headlines?country=tr&category=general&apiKey=$_apiKey");
+  final endPointUrl  = Uri.parse("https://newsapi.org/v2/top-headlines?country=us&category=general&apiKey=$_apiKey");
 
 
 Future<List<NewsModel>> getNewsModel() async{

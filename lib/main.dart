@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:kisisel_asistan/profileScreen.dart';
-import '/dashboard.dart';
+import 'package:kisisel_asistan/services/push_notifications.dart';
 import 'auth/logIn.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+        apiKey: 'AIzaSyC5o8T9tzN_epew6XVZCZKJhUp2lNp0M8A',
+        appId: '1:959087843995:android:211db8eefb37184a22443e',
+        messagingSenderId: '959087843995',
+        projectId: 'kisisel-asistan-login')
+  );
+  await FirebaseApi().initNotifications();
+      runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -41,8 +48,7 @@ class _HomePageState extends State<HomePage> {
 
 @override
 Widget build(BuildContext context) {
-  return Scaffold(
-    body: FutureBuilder(
+    return FutureBuilder(
       future: _initializeFirebase(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
@@ -53,14 +59,13 @@ Widget build(BuildContext context) {
             child: Text("Bir hata oluştu: ${snapshot.error}"),
           );
         }
-        return const Center(
+        return const Scaffold(
+        body:  Center(
           child:CircularProgressIndicator(),
+        ),
         );
       },
-    ),
   );
 }
-
-
 }
 
