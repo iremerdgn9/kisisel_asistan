@@ -1,12 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:extension/extension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kisisel_asistan/auth/logIn.dart';
+import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:kisisel_asistan/screens/calendarScreen.dart';
+import 'package:kisisel_asistan/screens/event_list.dart';
 import 'package:kisisel_asistan/screens/newsScreen.dart';
+import 'package:kisisel_asistan/screens/notes_list.dart';
 import 'package:kisisel_asistan/screens/weatherScreen.dart';
-import '/auth/signUp.dart';
 import 'package:kisisel_asistan/profileScreen.dart';
 import 'package:kisisel_asistan/screens/noteScreen.dart';
 
@@ -19,7 +23,7 @@ class Dashboard extends StatefulWidget {
 @override
 _DashboardState createState() => _DashboardState();
 }
-class _DashboardState extends State<Dashboard> {
+class _DashboardState extends State<Dashboard>{
 
 
   List<String> imgData = [
@@ -39,25 +43,25 @@ class _DashboardState extends State<Dashboard> {
       case 0:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => NoteScreen()),
+          MaterialPageRoute(builder: (context) => const NoteScreen()),
         );
         break;
       case 1:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => NewsScreen()),
+          MaterialPageRoute(builder: (context) => const NewsScreen()),
         );
         break;
       case 2:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => WeatherScreen()),
+          MaterialPageRoute(builder: (context) => const WeatherScreen()),
         );
         break;
       case 3:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CalendarScreen()),
+          MaterialPageRoute(builder: (context) => const CalendarScreen()),
         );
         break;
       default:
@@ -65,49 +69,64 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+
   late String adSoyad;
   late String email;
+ // List<Map<String, dynamic>> events = [];
 
   @override
   void initState() {
     super.initState();
     adSoyad = widget.adSoyad ?? 'Misafir Kullanıcı';
     email = widget.email ?? 'email';
-    _loadUserData(); // Firestore verilerini yükle
+    _loadUserData();
   }
+
 
   Future<void> _loadUserData() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-
       if (user != null) {
-        // Firestore'dan verileri çek
         DocumentSnapshot<Map<String, dynamic>> snapshot =
         await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-
-        // Firestore'dan alınan verileri kullanarak adSoyad ve email'i güncelle
+        if(snapshot.exists){
         setState(() {
-          adSoyad = snapshot['adSoyad'] ?? 'Misafir Kullanıcı';
-          email = snapshot['email'] ?? 'email';
+          adSoyad = snapshot.data()?['adSoyad'] ?? 'Misafir Kullanıcı';
+          email = snapshot.data()?['email'] ?? 'email';
         });
-      }
-    } catch (e) {
+      }else{
+          print('kullanıcı dökümanı bulunamadı');
+        }
+    }} catch (e) {
       print('Firestore veri çekme hatası: $e');
     }
   }
 
 
+
+bool isChecked = false;
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
+    Color getColor(Set<MaterialState> states) {
+      const Set<MaterialState> interactiveStates = <MaterialState>{
+        MaterialState.pressed,
+        MaterialState.hovered,
+        MaterialState.focused,
+      };
+      if (states.any(interactiveStates.contains)) {
+        return Colors.blue;
+      }
+      return Colors.pink;
+    }
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        toolbarHeight: 100, // İstediğiniz yüksekliği ayarlayın
+        toolbarHeight: 100,
         backgroundColor: Color(0xFFFFEDEA),
         leading: Builder(
           builder: (context) {
@@ -121,7 +140,7 @@ class _DashboardState extends State<Dashboard> {
             );
           }
         ),
-            title: Row(
+            title: const Row(
               children: [
                 Text(" My",
                   style: TextStyle(fontWeight: FontWeight.bold,fontSize: 30,color:Color(0xFFCEA0AA) ),),
@@ -133,37 +152,36 @@ class _DashboardState extends State<Dashboard> {
               ],
             ),
         ),
-      body: SingleChildScrollView(
-         child: SafeArea(
-          bottom: true,
-          child: Column(
-            children:<Widget> [
-              Container(
-                width: width,
-                height: height,
-                padding: EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: Color(0xFFCEA0AA),
-                  borderRadius: BorderRadius.circular(15)
+      body: SafeArea(
+        child: Column(
+          children:<Widget> [
+            Container(
+              width: width,
+              //height: 40,
+              padding: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Color(0xFFCEA0AA),
+                borderRadius: BorderRadius.circular(15)
+              ),
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.1,
+                  mainAxisSpacing: 5,
                 ),
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 1.1,
-                    mainAxisSpacing: 5,
-                  ),
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: imgData.length,
-                  itemBuilder: (context,index) {
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: imgData.length,
+                itemBuilder: (context,index) {
                     return InkWell(
-                      onTap: (){
+                      onTap: () {
                         _navigateToPage(index);
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
-                          margin: EdgeInsets.symmetric(vertical: 1.0,horizontal: 1.0),
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 1.0, horizontal: 1.0),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10.0),
                             color: Colors.white,
@@ -179,19 +197,61 @@ class _DashboardState extends State<Dashboard> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Image.asset(imgData[index],
-                              width: 100,),
+                                width: 100,),
                               Text(titles[index]),
                             ],
                           ),
                         ),
                       ),
                     );
-                  },
-                    ),
-              ),
-                  ],
-          ),
-          ),
+                },
+                  ),
+            ),
+
+            DefaultTabController(
+              length: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(1),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                spreadRadius: 1,
+                                blurRadius: 6,
+                              ),
+                            ]),
+                        child: TabBar(
+                          labelColor: Color(0xFF364765),
+                          unselectedLabelColor: Color(0xFF9DB0CE),
+                          indicatorColor: Colors.amber,
+                          tabs: <Widget>[
+                            Tab(text: "Etkinlikler"),
+                            Tab(text: "Notlar"),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: height * 0.3,
+                        child: TabBarView(
+                            children: <Widget>[
+                              const SingleChildScrollView(
+                                  child: EventListWidget()),
+                              SingleChildScrollView(
+                                  child: NoteList()),
+                            ],
+                          ),
+                      ),
+                    ],
+                  ),
+            ),
+          ],
+        ),
       ),
       drawer: Drawer(
         backgroundColor: Colors.white,
@@ -208,17 +268,17 @@ class _DashboardState extends State<Dashboard> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   //mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: 20), // İstenilen boşluk
+                    SizedBox(height: 20),
           
                     Text(" ${adSoyad}",
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
-                    SizedBox(height: 5), // İstenilen boşluk
+                    SizedBox(height: 5),
                   ],
                 ),
                 accountEmail: Column(
                   children: [
                     Text(" ${email}"),
-                    SizedBox(height: 5), // İstenilen boşluk
+                    SizedBox(height: 5),
                   ],
                 ),
                 currentAccountPicture: const Column(
@@ -297,7 +357,7 @@ class _DashboardState extends State<Dashboard> {
                       ),
                     ],
                   ),
-                  ListTile(
+                 /* ListTile(
                       title: new Text("Favorilerim",
                         style: TextStyle(fontSize: 18),),
                       leading: new Icon(Icons.newspaper),
@@ -305,7 +365,7 @@ class _DashboardState extends State<Dashboard> {
                       onTap: () {
                         Navigator.pushNamed(context, '/Favoriler');
                       }
-                  ),
+                  ), */
                   ListTile(
                       title: new Text("Profilim",
                         style: TextStyle(fontSize: 18),),

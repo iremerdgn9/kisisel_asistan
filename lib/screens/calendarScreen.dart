@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -22,7 +21,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Firestore'dan verileri çek
         final eventsSnapshot = await eventsCollection.where('userId', isEqualTo: user.uid).get();
 
         setState(() {
@@ -32,12 +30,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
             final eventTitle = doc.data()['event_title'] as String;
             final eventDescp = doc.data()['event_descp'] as String;
             final formattedDate = DateFormat('yyyy-MM-dd').format(eventDate);
+            final eventTime = doc.data()['event_time'] as String;
             if (mySelectedEvents[formattedDate] == null) {
               mySelectedEvents[formattedDate] = [];
             }
+            final eventTimeSplit = eventTime.split(':');
+            final eventHour = int.parse(eventTimeSplit[0]);
+            final eventMinute = int.parse(eventTimeSplit[1]);
+            final eventDateTime = DateTime(eventDate.year, eventDate.month, eventDate.day, eventDate.hour, eventDate.minute);
+
             mySelectedEvents[formattedDate]?.add({
               "event_title": eventTitle,
               "event_descp": eventDescp,
+              "event_time": eventDateTime,
+              "event_icon": doc.data()['event_icon'] ?? 'default',
             });
           }
         });
@@ -46,8 +52,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     }
   }
 
-// Add event to Firestore (replace with your logic)
-  Future<void> addEventToFirestore(DateTime date,String title, String descp) async {
+  Future<void> addEventToFirestore(DateTime date,String title, String descp,TimeOfDay time) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final eventRef = eventsCollection.doc();
@@ -56,7 +61,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
         'event_date': Timestamp.fromDate(date),
         'event_title': title,
         'event_descp': descp,
+        'event_time': '${time.hour}:${time.minute}',
+        'event_icon': _selectedIcon,
+
       });
+
     }
   }
 
@@ -64,6 +73,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDate;
   Map<String,List> mySelectedEvents = {};
+  String _selectedIcon = 'default';
+  TimeOfDay? _selectedTime;
+
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descpController = TextEditingController();
@@ -78,13 +90,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   List _listOfDayEvents(DateTime dateTime){
+    //final selectedDateKey = DateFormat('yyyy-MM-dd').format(dateTime);
     if(mySelectedEvents[DateFormat('yyyy-MM-dd').format(dateTime)] != null){
       return mySelectedEvents[DateFormat('yyyy-MM-dd').format(dateTime)]!;
     }else{
       return [];
-    }
+    //final events = mySelectedEvents[selectedDateKey];
 
-  }
+    //return events != null ? List.from(events) : [];
+
+  }}
 
   _showAddEventDialog() async{
     await showDialog(
@@ -109,6 +124,60 @@ class _CalendarScreenState extends State<CalendarScreen> {
               hintText: 'Description',
             ),
           ),
+          ListTile(
+            title: const Text('Select Time'),
+            trailing: IconButton(
+              icon: const Icon(Icons.access_time),
+              onPressed: () async {
+                TimeOfDay? picked = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay.now(),
+                );
+                if (picked != null) {
+                  setState(() {
+                    _selectedTime = picked;
+                  });
+                }
+              },
+            ),
+            subtitle: _selectedTime != null
+                ? Text('Selected Time: ${_selectedTime!.format(context)}')
+                : const Text('No time selected'),
+          ),
+          const Text('Select Icon'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.sports_soccer),
+                color: _selectedIcon == 'sports' ? Colors.blue : Colors.black,
+                onPressed: () {
+                  setState(() {
+                    _selectedIcon = 'sports';
+                  });
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.work),
+                color: _selectedIcon == 'work' ? Colors.blue : Colors.black,
+                onPressed: () {
+                  setState(() {
+                    _selectedIcon = 'work';
+                  });
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.school),
+                color: _selectedIcon == 'school' ? Colors.blue : Colors.black,
+                onPressed: () {
+                  setState(() {
+                    _selectedIcon = 'school';
+                  });
+                },
+              ),
+              // Add more icons as needed
+            ],
+          ),
         ],
       ),
       actions: [
@@ -117,15 +186,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
           child: Text('Cancel'),),
         TextButton(child: Text('Add event'),
           onPressed:() async {
-          if(titleController.text.isEmpty && descpController.text.isEmpty){
+          if(titleController.text.isEmpty && descpController.text.isEmpty || _selectedTime == null){
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Başlık ve açıklama giriniz..'),
+              content: Text('Başlık, açıklama ve saat giriniz..'),
               duration: Duration(seconds: 2),),
             );
             return;
           }else {
             final eventTitle = titleController.text;
             final eventDescp = descpController.text;
+            final selectedTime = _selectedTime!;
 
             setState(() {
               if(mySelectedEvents[DateFormat('yyyy-MM-dd')
@@ -133,16 +203,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 mySelectedEvents[DateFormat('yyyy-MM-dd').format(_selectedDate!)]?.add({
                   "event_title": eventTitle,
                   "event_descp": eventDescp,
+                  "event_time": selectedTime,
                 });
               } else {
                 mySelectedEvents[DateFormat('yyyy-MM-dd').format(_selectedDate!)]=[
-                  {"event_title": eventTitle, "event_descp": eventDescp}];
+                  {"event_title": eventTitle, "event_descp": eventDescp,"event_time": DateTime(
+              _selectedDate!.year,
+              _selectedDate!.month,
+              _selectedDate!.day,
+              selectedTime.hour,
+              selectedTime.minute,
+              ),
+              "event_icon": _selectedIcon,
+                  }];
               }
             });
-            await addEventToFirestore(_selectedDate!, eventTitle, eventDescp);
+            await addEventToFirestore(_selectedDate!, eventTitle, eventDescp,selectedTime);
 
             titleController.clear();
             descpController.clear();
+            _selectedTime = null;
             Navigator.pop(context);
             return;
           }
@@ -164,7 +244,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
         children:<Widget>[
           TableCalendar(focusedDay: _focusedDay, firstDay: DateTime(2020), lastDay: DateTime(2030),
               calendarFormat: _calendarFormat,
-        
               onDaySelected: (selectedDay,focusedDay){
             if(!isSameDay(_selectedDate,selectedDay)){
               setState(() {
@@ -183,7 +262,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
               });
             }
             },
-        
             onPageChanged: (focusedDay){
             _focusedDay = focusedDay;
             },
@@ -191,18 +269,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
         
           if(_selectedDate != null)
-          ..._listOfDayEvents(_selectedDate!).map(
-                  (myEvents) => ListTile(
-                    leading: const Icon(
-            Icons.done_outline,
-            color: Colors.pink,
-          ),
-          title: Padding(
-            padding: EdgeInsets.only(bottom: 10.0),
-            child: Text('Event Title:  ${myEvents['event_title']}'),
-          ),
-          subtitle: Text('Description:  ${myEvents['event_descp']}'),
-                  ),
+          ..._listOfDayEvents(_selectedDate!).map((myEvents) {
+          if (myEvents['event_icon'] != null &&
+              myEvents['event_time'] != null) {
+            return ListTile(
+              leading: Icon(
+                _getIcon(myEvents['event_icon'] ?? ''),
+                color: Colors.pink,
+              ),
+              title: Padding(
+                padding: EdgeInsets.only(bottom: 10.0),
+                child: Text('Event Title:  ${myEvents['event_title']}'),
+              ),
+              subtitle: Text('Description:  ${myEvents['event_descp']}\n'
+                  'Time: ${DateFormat('HH:mm').format(
+                  (myEvents['event_time']))}'),
+            );
+          }else{
+            return SizedBox.shrink();
+          }
+    },
           ),
             ],
             ),
@@ -214,4 +300,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
           label: const Text('Add Event')),
     );
   }
+  IconData _getIcon(String icon) {
+    switch (icon) {
+      case 'sports':
+        return Icons.sports_soccer;
+      case 'work':
+        return Icons.work;
+      case 'school':
+        return Icons.school;
+      default:
+        return Icons.event;
+    }
+  }
+
 }
