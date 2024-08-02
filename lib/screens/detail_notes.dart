@@ -3,11 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:kisisel_asistan/screens/edit_note.dart';
 import 'package:kisisel_asistan/screens/noteScreen.dart';
 
 class NoteDetail extends StatefulWidget {
+  final QueryDocumentSnapshot doc;
   NoteDetail(this.doc, {super.key});
-  QueryDocumentSnapshot doc;
 
   @override
   State<NoteDetail> createState() => _NoteDetailState();
@@ -21,14 +22,14 @@ class NoteDetail extends StatefulWidget {
 }
 
 class _NoteDetailState extends State<NoteDetail> {
-  bool _isEditEnabled = false; // Flag to control edit mode
+  bool _isEditEnabled = false;
   String _noteTitle = '';
   String _noteContent = '';
 
   @override
   void initState() {
     super.initState();
-    _noteTitle = widget.doc['note_title']; // Pre-fill with existing values
+    _noteTitle = widget.doc['note_title'];
     _noteContent = widget.doc['note_content'];
   }
 
@@ -45,7 +46,7 @@ class _NoteDetailState extends State<NoteDetail> {
         onPressed: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const NoteScreen(),),
+            MaterialPageRoute(builder: (context) => NoteScreen(),),
           );
         },
       ),
@@ -79,7 +80,6 @@ class _NoteDetailState extends State<NoteDetail> {
               style: TextStyle(fontSize: 18),),
             ),
             SizedBox(height: 10,),
-
           ],
         ),
       ),
@@ -116,6 +116,10 @@ class _NoteDetailState extends State<NoteDetail> {
                   : FloatingActionButton.extended(
                 heroTag: Icons.edit,
                 onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => EditNote(widget.doc),),
+                  );
                   setState(() {
                     _isEditEnabled = true;
                   });

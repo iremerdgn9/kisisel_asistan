@@ -126,14 +126,14 @@ class _LogInState extends State<LogIn> {
           ),
           child: Column(
             children:<Widget>[
-              SizedBox(height: 50,),
+              SizedBox(height: 60,),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 40),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children:<Widget> [
                     const Text(" Log-in", style: TextStyle(color: Color(0xFF535878), fontSize: 25,),),
-                    const SizedBox(height: 40,),
+                    const SizedBox(height: 50,),
                     Container(
                       padding: EdgeInsets.all(10),
                       decoration: const BoxDecoration(
