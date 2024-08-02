@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kisisel_asistan/screens/noteScreen.dart';
 import 'package:kisisel_asistan/screens/detail_notes.dart';
@@ -125,7 +126,10 @@ String date= DateTime.now().toString();
               },
             );
           } else {
+            User? user = FirebaseAuth.instance.currentUser;
+
             FirebaseFirestore.instance.collection("notes").add({
+              "userId": user?.uid,
               "note_title": _titleController.text,
               "creation_date": date,
               "note_content": _mainController.text,

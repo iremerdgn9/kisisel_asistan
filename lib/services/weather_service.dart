@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:kisisel_asistan/models/weather_model.dart';
@@ -12,26 +15,23 @@ class WeatherService {
       if (!serviceEnabled) {
         Future.error('konum servisiniz kapalı.');
       }
-      //kullanıcı konum izni verdi mi diye kontrol ettik.
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        //konum izni vermemişse tekrar izin istedik.
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          //yine izin vermemişse hata döndürdük.
           Future.error('konum izni vermelisiniz!');
         }
       }
-      //high kesin konum, low yaklaşık konumu verir.
-      //kullanıcının pozisyonunu aldık.
+
       final Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
       //kullanıcının pozisyonundan yerleşim noktasını bulduk.
       final List<Placemark> placemark = await placemarkFromCoordinates(
           position.latitude, position.longitude);
-      //print(placemark);
+      print(placemark);
       //şehri yerleşim noktasından kaydettik.
       final String? city = placemark[0].administrativeArea;
+
       if (city == null) Future.error('bir sorun oluştu');
       return city!;
     }
