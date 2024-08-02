@@ -21,6 +21,11 @@ class NoteScreen extends StatefulWidget {
 }
 
 class _NoteScreenState extends State<NoteScreen> {
+  final Map<int, bool> _favoriteMap = {};
+  bool _isFavorite = false;
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,6 +110,29 @@ class _NoteScreenState extends State<NoteScreen> {
                                   ),
                                 ),
                                 SizedBox(height: 10,),
+                                    ListTile(
+                                      leading:
+                                      IconButton(
+                                          icon: Icon(Icons.favorite),
+                                          onPressed: () {
+                                            //Navigator.push(
+                                              //context,
+                                              //MaterialPageRoute(builder: (context) => FavoriteScreen()),
+                                            //);
+                                          },
+                                        ),
+                                      minLeadingWidth: 2,
+                                      //style: ListTileStyle(),
+                                      trailing: Padding(
+                                        padding: EdgeInsets.only(right: 10.0),
+                                        child: Icon(Icons.check_box_outlined,color: _isFavorite? Colors.green : null),
+                                      ),
+                                      onTap: () {
+                                        setState(() {
+                                          _isFavorite = !_isFavorite;
+                                        });
+                                      },
+                                    ),
                               ],
                             ),
                           ),
@@ -119,6 +147,7 @@ class _NoteScreenState extends State<NoteScreen> {
                 },
                 ),
           ),
+
         ],
 
       ),

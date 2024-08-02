@@ -16,18 +16,25 @@ class NewsScreen extends StatefulWidget {
 class _NewsScreenState extends State<NewsScreen> {
   List<NewsModel> allArticles = [];
   List<NewsModel> filteredArticles = [];
-  String selectedCategory = 'business';
+  String selectedCategory = 'General';
   NewsApiService client = NewsApiService();
 
-  void _getNewsModel() async {
+
+  @override
+  void initState(){
+    _getNewsModel(selectedCategory);
+    super.initState();
+  }
+
+
+  void _getNewsModel(String category) async {
     try {
-      List<NewsModel>? articles = await NewsApiService().getNewsModel();
+      List<NewsModel>? articles = await client.getNewsModel(category);
         setState(() {
-          allArticles = articles!;
-          filteredArticles = allArticles;
+          allArticles = articles;
+          _filterNewsByCategory(selectedCategory);
         });
       }catch(error) {
-        // Handle API errors here
         print("Error fetching news: $error");
       }
     }
@@ -35,16 +42,15 @@ class _NewsScreenState extends State<NewsScreen> {
   void _filterNewsByCategory(String category) {
     setState(() {
       selectedCategory = category;
-      filteredArticles = allArticles.where((article) => article.category == category).toList();
+      filteredArticles = (category.isEmpty || category.toLowerCase() == 'all')
+          ? allArticles
+          : allArticles
+          .where((article) =>
+      article.category?.toLowerCase() == category.toLowerCase())
+          .toList();
     });
   }
 
-
-  @override
-  void initState(){
-    _getNewsModel();
-    super.initState();
-  }
 
 
   @override
@@ -65,13 +71,11 @@ class _NewsScreenState extends State<NewsScreen> {
           ),
         ),
         body: FutureBuilder(
-        future: client.getNewsModel(),
+        future: client.getNewsModel(selectedCategory),
           builder: (BuildContext context,AsyncSnapshot<List<NewsModel>> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              // Veri henüz yüklenmediyse, bir yükleme göstergesi gösterin
               return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              // Hata oluştuğunda hata mesajını gösterin
               return Center(child: Text('Hata: ${snapshot.error}'));
             } else if (snapshot.hasData) {
               List<NewsModel>? filteredArticles = snapshot.data;
@@ -82,34 +86,20 @@ class _NewsScreenState extends State<NewsScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      FilterChip(label: Text('Business'),
-                        selected: selectedCategory=='Business',
-                        onSelected: (value)=> _filterNewsByCategory('business'),),
-                      FilterChip(label: Text('Entertainment'),
-                        selected: selectedCategory=='Entertainment',
-                        onSelected: (value)=> _filterNewsByCategory('Entertainment'),),
-                      FilterChip(label: Text('General'),
-                        selected: selectedCategory=='General',
-                        onSelected: (value)=> _filterNewsByCategory('General'),),
-                      FilterChip(label: Text('Technology'),
-                        selected: selectedCategory=='technology',
-                        onSelected: (value)=> _filterNewsByCategory('technology'),),
-                      FilterChip(label: Text('Science'),
-                        selected: selectedCategory=='science',
-                        onSelected: (value)=> _filterNewsByCategory('science'),),
-                      FilterChip(label: Text('Health'),
-                        selected: selectedCategory=='health',
-                        onSelected: (value)=> _filterNewsByCategory('health'),),
-                      FilterChip(label: Text('Sports'),
-                        selected: selectedCategory=='sports',
-                        onSelected: (value)=> _filterNewsByCategory('sports'),),
+                      _buildCategoryChip('Business'),
+                      _buildCategoryChip('Entertainment'),
+                      _buildCategoryChip('General'),
+                      _buildCategoryChip('Technology'),
+                      _buildCategoryChip('Science'),
+                      _buildCategoryChip('Health'),
+                      _buildCategoryChip('Sports'),
                     ],
-
                   ),
                 ),
                 Expanded(
-                  child: ListView.builder(
-                      itemCount: filteredArticles!.length,
+                  child: filteredArticles!.isNotEmpty
+                ?  ListView.builder(
+                      itemCount: filteredArticles.length,
                       itemBuilder: (context, index) {
                         final NewsModel article = filteredArticles[index];
                   if (article.urlToImage != null) {
@@ -118,22 +108,22 @@ class _NewsScreenState extends State<NewsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Image.network(
-                            filteredArticles[index].urlToImage.toString(),
+                            article.urlToImage.toString(),
                           ),
                            SizedBox(height: 10,),
                           ListTile(
                             leading: Icon(Icons.favorite_border),
                             minLeadingWidth: 3,
-                            title: Text(filteredArticles[index].title.toString(),
+                            title: Text(article.title.toString(),
                               style:const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold),),
-                            subtitle: Text(filteredArticles[index].author.toString()),
+                            subtitle: Text(article.author.toString() ?? 'author'),
                           ),
                           Padding(
                             padding:const EdgeInsets.all(1.0),
                             child: Text(
-                              filteredArticles[index].description.toString(),
+                              article.description.toString(),
                               style: TextStyle(fontSize: 15),),
                           ),
                           ButtonBar(
@@ -141,7 +131,7 @@ class _NewsScreenState extends State<NewsScreen> {
                             children: <Widget>[
                               TextButton(
                                 onPressed: () async {
-                                  String? url = filteredArticles[index].url?.toString();
+                                  String? url = article.url?.toString();
                                   print(
                                       'URL: $url'); // URL'nin doğru olduğunu kontrol etmek için
                                   if (url != null && url.isNotEmpty) {
@@ -158,21 +148,35 @@ class _NewsScreenState extends State<NewsScreen> {
                           ),
                         ],
                       ),
-                    );
-                  }else{
-                    return SizedBox();
-
+                        );
+            }else{
+                    return const SizedBox();
                   }
-                      }),
+                      },
+                      )
+                          : const Center(child: Text('No news available for the selected category'),
+            ),
                 ),
                 ],
               );
             } else {
-              return SizedBox();
+              return const SizedBox();
     }
           },
     ),
     );
     }
+  Widget _buildCategoryChip(String category) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: FilterChip(
+        label: Text(category),
+        selected: selectedCategory.toLowerCase() == category.toLowerCase(),
+        onSelected: (value) => _filterNewsByCategory(category),
+      ),
+    );
   }
+  }
+
+
 

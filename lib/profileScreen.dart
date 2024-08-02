@@ -70,7 +70,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 30,),
-                Text("Hoşgeldiniz, ${snapshot.data}",
+                Text("Hoşgeldiniz, ${adSoyad}",
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold,),
                 ),
                 SizedBox(height: 100,),
