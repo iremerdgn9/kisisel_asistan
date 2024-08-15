@@ -1,12 +1,14 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 import 'package:kisisel_asistan/models/news_model.dart';
 
 class NewsApiService {
-  static const String _apiKey = "eb9dee953a784f848a327036dee9153d";
+  final String _apiKey = "${dotenv.env["NEWS_API_KEY"]}";
+  final baseUrl= dotenv.env['BASE_URL'];
 
 Future<List<NewsModel>> getNewsModel(String category) async{
-    final endPointUrl  = Uri.parse("https://newsapi.org/v2/top-headlines?country=us&category=$category&apiKey=$_apiKey");
+    final endPointUrl  = Uri.parse("$baseUrl?country=us&category=$category&apiKey=$_apiKey");
     final Response res = await get(endPointUrl);
 
     if (res.statusCode == 200) {

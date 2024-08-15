@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:kisisel_asistan/dashboard.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,13 +16,11 @@ class _SignUpState extends State<SignUp> {
 
   static Future<User?> createUserWithEmailAndPassword(
       {required String adSoyad,required String email, required String password, required BuildContext context}) async {
-    await Firebase.initializeApp(options: const FirebaseOptions(
-      apiKey:
-      "AIzaSyC5o8T9tzN_epew6XVZCZKJhUp2lNp0M8A",
-      appId:
-      "1:959087843995:android:211db8eefb37184a22443e",
-      messagingSenderId: "959087843995",
-      projectId: "kisisel-asistan-login",
+    await Firebase.initializeApp(options: FirebaseOptions(
+      apiKey: "${dotenv.env["F_APIKEY"]}",
+      appId: "${dotenv.env["APP_ID"]}",
+      messagingSenderId: "${dotenv.env["MS_ID"]}",
+      projectId: "${dotenv.env["PROJECT_ID"]}",
     ),);
     FirebaseAuth auth = FirebaseAuth.instance;
     User? user;

@@ -18,7 +18,6 @@ class _WeatherScreenState extends State<WeatherScreen> {
     _weathers = await WeatherService().getWeatherData();
     if(mounted){
     setState(() {
-
     });
   }}
 
@@ -27,7 +26,6 @@ class _WeatherScreenState extends State<WeatherScreen> {
     _getWeatherData();
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {

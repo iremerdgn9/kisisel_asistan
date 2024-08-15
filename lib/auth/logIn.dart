@@ -10,7 +10,6 @@ import 'package:kisisel_asistan/auth/signUp.dart';
 import 'package:kisisel_asistan/dashboard.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
-
 class LogIn extends StatefulWidget {
   final String? adSoyad;
   final String? email;
@@ -75,34 +74,6 @@ class _LogInState extends State<LogIn> {
     }
   }
 
-
- /* void _handleGoogleIn(BuildContext context) async {
-    try {
-      final userCredential = await AuthService().signInWithGoogle();
-      if (userCredential != null) {
-        final user = userCredential.user!;
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => Dashboard(
-              adSoyad: user.displayName ?? '',
-              email: user.email ?? '',
-            ),
-          ),
-        );
-      }
-    } catch (error) {
-      if (kDebugMode) {
-        print('Google sign-in failed: $error');
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Google sign-in failed: ${error.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-*/
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -318,30 +289,3 @@ class _LogInState extends State<LogIn> {
   }
 
 }
-
-
-
-/*class AuthService {
-  signInWithGoogle() async {
-    try {
-      final GoogleSignIn googleSignIn = GoogleSignIn();
-      final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
-      if (googleSignInAccount != null) {
-        final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
-
-        final credential = GoogleAuthProvider.credential(
-          idToken: googleSignInAuthentication.idToken,
-          accessToken: googleSignInAuthentication.accessToken,
-        );
-
-        return await FirebaseAuth.instance.signInWithCredential(credential);
-      }
-    } catch (error) {
-      print(error);
-      return null;
-    }
-    return null;
-  }
-
-}
- */

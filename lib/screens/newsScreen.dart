@@ -19,13 +19,11 @@ class _NewsScreenState extends State<NewsScreen> {
   String selectedCategory = 'General';
   NewsApiService client = NewsApiService();
 
-
   @override
   void initState(){
     _getNewsModel(selectedCategory);
     super.initState();
   }
-
 
   void _getNewsModel(String category) async {
     try {
@@ -50,8 +48,6 @@ class _NewsScreenState extends State<NewsScreen> {
           .toList();
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {

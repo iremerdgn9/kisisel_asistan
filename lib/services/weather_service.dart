@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:kisisel_asistan/models/weather_model.dart';
@@ -38,10 +39,11 @@ class WeatherService {
 
     Future<List<WeatherModel>> getWeatherData() async {
       final String city = await _getLocation();
-      final String url = 'https://api.collectapi.com/weather/getWeather?data.lang=tr&data.city=$city';
-      const Map<String, dynamic> headers = {
-        'authorization': 'apikey 6vpYvE5pG41hMVThvhB5xJ:4xlQdRoGTtpb9IjoPoXBdv',
-        'content-type': 'application/json'
+      final weatherUrl = dotenv.env['WEATHER_URL'];
+      final String url = '$weatherUrl?data.lang=tr&data.city=$city';
+      final Map<String, dynamic> headers = {
+        'authorization': '${dotenv.env["AUTHORIZATION"]}',
+        'content-type': '${dotenv.env["CONTENT_TYPE"]}'
       };
 
       final dio = Dio();

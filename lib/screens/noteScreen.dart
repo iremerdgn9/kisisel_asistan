@@ -24,8 +24,6 @@ class _NoteScreenState extends State<NoteScreen> {
   final Map<int, bool> _favoriteMap = {};
   bool _isFavorite = false;
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,9 +145,7 @@ class _NoteScreenState extends State<NoteScreen> {
                 },
                 ),
           ),
-
         ],
-
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: (){
@@ -161,9 +157,7 @@ class _NoteScreenState extends State<NoteScreen> {
         backgroundColor: const Color(0xFF9DB0CE),
         label: const Text("Add Note"),
         icon: const Icon(Icons.add_card),
-
       ),
     );
-
   }
 }

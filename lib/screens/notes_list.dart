@@ -13,7 +13,6 @@ class NoteList extends StatefulWidget {
 
 class _NoteListState extends State<NoteList> {
   List<Map<String, dynamic>> notes = [];
-
   User? user;
   @override
   void initState() {
@@ -43,7 +42,6 @@ class _NoteListState extends State<NoteList> {
               'creation_date': creationDate,
               'note_content': data['note_content'] ?? 'No Content',
               //'creation_date': (data['creation_date'] as Timestamp).toDate(),
-
             };
           }).toList();
         });
@@ -64,15 +62,12 @@ class _NoteListState extends State<NoteList> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
-
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
-
         if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
           return Center(child: Text('No notes available'));
         }
-
         if (snapshot.hasData) {
           return SingleChildScrollView(
             child: Column(
@@ -125,7 +120,6 @@ class _NoteListState extends State<NoteList> {
       return DateTime.now();
     }
   }
-
 
   IconData _getIcon(String icon) {
     switch (icon) {

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class EventListWidget extends StatefulWidget {
-
   const EventListWidget({super.key});
 
   @override
@@ -13,9 +12,7 @@ class EventListWidget extends StatefulWidget {
 }
 
 class _EventListWidgetState extends State<EventListWidget> {
-
   List<Map<String, dynamic>> events = [];
-
 
   @override
   void initState() {
@@ -64,7 +61,6 @@ class _EventListWidgetState extends State<EventListWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
                         children: [
                           if (events.isNotEmpty)
@@ -80,8 +76,6 @@ class _EventListWidgetState extends State<EventListWidget> {
                           else
                             Text('No events available'),
                         ],
-
       );
-
   }
   }
